@@ -1,0 +1,40 @@
+@if (office(); as o) {
+  <p><a routerLink="/">&larr; Back to offices</a></p>
+  <h1>{{ o.name }}</h1>
+  <p>{{ o.address }}, {{ o.city }} &middot; {{ o.phone }}</p>
+
+  @if (confirmation(); as c) {
+    <section class="done" role="status">
+      <h2>Appointment confirmed</h2>
+      <p>Reference <strong>{{ c.reference }}</strong>. A confirmation would be sent to {{ email() }}.</p>
+    </section>
+  } @else {
+    <form (ngSubmit)="submit()">
+      <fieldset>
+        <legend>1. Choose a slot</legend>
+        @for (d of days(); track d.key) {
+          <h2>{{ d.date | date: 'fullDate' }}</h2>
+          <div class="slots">
+            @for (s of d.slots; track s.id) {
+              <button type="button" [disabled]="!s.available" [attr.aria-pressed]="chosen()?.id === s.id" (click)="chosen.set(s)">
+                {{ s.start | date: 'HH:mm' }}
+              </button>
+            }
+          </div>
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Your details</legend>
+        <label for="n">Full name</label>
+        <input id="n" name="n" autocomplete="name" required [ngModel]="fullName()" (ngModelChange)="fullName.set($event)" />
+        <label for="e">Email</label>
+        <input id="e" name="e" type="email" autocomplete="email" required [ngModel]="email()" (ngModelChange)="email.set($event)" />
+      </fieldset>
+
+      <button type="submit" [disabled]="!chosen()">Confirm appointment</button>
+    </form>
+  }
+} @else {
+  <p>Unknown office. <a routerLink="/">Back to offices</a></p>
+}

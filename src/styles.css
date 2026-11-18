@@ -1,0 +1,15 @@
+@import 'leaflet/dist/leaflet.css';
+
+body { margin: 0; font-family: system-ui, sans-serif; color: #0f172a; background: #f8fafc; line-height: 1.5; }
+a { color: #1d4ed8; }
+input { font: inherit; padding: 8px 10px; border: 1px solid #64748b; border-radius: 6px; }
+button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid #1d4ed8; background: #1d4ed8; color: #fff; padding: 8px 14px; }
+button.secondary { background: #fff; color: #1d4ed8; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+:focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Map markers (CSS-only, no image assets) */
+.office-pin span { display: block; width: 22px; height: 22px; margin: 3px; background: #1d4ed8; border: 2px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 1px 4px rgb(0 0 0 / 0.4); }
+.office-pin.is-selected span { background: #dc2626; transform: rotate(-45deg) scale(1.25); }
+.user-dot { fill: #16a34a; stroke: #fff; fill-opacity: 1; }

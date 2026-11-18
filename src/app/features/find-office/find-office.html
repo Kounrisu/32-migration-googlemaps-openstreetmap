@@ -1,0 +1,37 @@
+<h1>Book an appointment</h1>
+<p class="lead">Find the nearest office, then choose a time slot.</p>
+
+<form class="search" role="search" (ngSubmit)="search()">
+  <label for="addr">Your address or city</label>
+  <div class="row">
+    <input id="addr" name="addr" type="search" autocomplete="street-address" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+    <button type="submit">Search</button>
+    <button type="button" class="secondary" (click)="locate()">Use my position</button>
+  </div>
+</form>
+
+<p class="status" role="status" aria-live="polite">{{ status() }}</p>
+
+@if (suggestions().length) {
+  <ul class="suggestions" aria-label="Address suggestions">
+    @for (s of suggestions(); track s.label) {
+      <li><button type="button" (click)="pick(s)">{{ s.label }}</button></li>
+    }
+  </ul>
+}
+
+<div class="layout">
+  <ul class="offices" aria-label="Offices">
+    @for (o of list(); track o.id) {
+      <li [class.selected]="o.id === selectedId()">
+        <button type="button" class="pick" (click)="selectedId.set(o.id)" [attr.aria-pressed]="o.id === selectedId()">
+          <strong>{{ o.name }}</strong>
+          <span>{{ o.address }}, {{ o.city }}</span>
+          @if (o.distanceKm !== undefined) { <span class="dist">{{ o.distanceKm.toFixed(0) }} km</span> }
+        </button>
+        <a [routerLink]="['/book', o.id]">Choose a slot<span class="sr"> at {{ o.name }}</span></a>
+      </li>
+    }
+  </ul>
+  <app-osm-map [offices]="list()" [selectedId]="selectedId()" [user]="origin()" (officeSelected)="selectedId.set($event)" />
+</div>
