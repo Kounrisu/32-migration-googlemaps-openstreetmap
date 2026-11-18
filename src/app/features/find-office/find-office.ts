@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Geocoder, GeocodeResult } from '../../core/geocoding/geocoder';
 import { LatLng } from '../../core/models';
+import { navigationLinks } from '../../core/navigation-links';
 import { OfficeService } from '../../core/office.service';
 import { OfficeMap } from './office-map';
 
@@ -26,6 +27,12 @@ export class FindOffice {
   protected readonly list = computed(() => {
     const from = this.origin();
     return from ? this.offices.nearest(from) : this.offices.offices();
+  });
+
+  protected readonly selected = computed(() => this.list().find((o) => o.id === this.selectedId()) ?? null);
+  protected readonly links = computed(() => {
+    const o = this.selected();
+    return o ? navigationLinks(o) : [];
   });
 
   protected async search(): Promise<void> {

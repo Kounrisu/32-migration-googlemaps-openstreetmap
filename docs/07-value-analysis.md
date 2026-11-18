@@ -71,6 +71,45 @@ its current usage limits were **not verified** (check geoservices.ign.fr "Limite
 Suggested decision path: ship **E + a light map from C** (FP1 only), keep A behind the config
 switch for as long as needed, and drop it once the DPO and security officer confirm.
 
+### 4.1 Observed practice in French public bodies and transport operators
+
+Observed on 2026-11-18 from public pages and press. It shows what others chose; it is not a
+recommendation, and an app can differ from its website.
+
+| Organisation | What was observed | Source type |
+| --- | --- | --- |
+| Caisse de Valmor (national public institution, name changed) | Branch locator page loads **Leaflet** with the **community OSM tile server** (`tile.openstreetmap.org`), attribution "(c) OpenStreetMap contributors" | Page inspected directly |
+| RATP (route planner on the website) | **Leaflet** with tiles from the operator's own supplier (onyourmap, RATP Smart Systems), data (c) TomTom. Neither Google nor OSM. | Page inspected directly |
+| SNCF Connect (app) | **MapLibre Native** through Flutter for transit maps and journey planning | Community directory (secondary) |
+| SNCF Connect & Tech | Launched **Tesmo Maps** (June 2026), built on OpenStreetMap, for operators and local authorities; the customer keeps ownership of its data and can restyle the base map | Trade press, read in full |
+| Vélib' | Nothing reliable found | Not established |
+
+What it means for this project:
+
+- None of the sources above relies on Google Maps for what could be observed.
+- Leaflet + OSM tiles, which is what the PoC does, matches what at least one public institution
+  runs today.
+- The community OSM tile server is a demo-grade service with a usage policy that rules out
+  heavy production traffic. Production needs a dedicated tile source (IGN Géoplateforme or a
+  self-hosted tile server).
+
+### 4.2 Itineraries by mode (walk, bike, public transport, car)
+
+No single public service covers the four modes. Google does, with one key.
+
+| Mode | Public / open option | Verified facts |
+| --- | --- | --- |
+| Base map, roads and towns | IGN Plan (vector tiles, MapLibre) via cartes.gouv.fr, or the Carte Facile component | Documented on cartes.gouv.fr; styles `standard`, `classique`, `gris`, `accentue` |
+| Walk | Géoplateforme route API (`data.geopf.fr/navigation/itineraire`) | Profile `pieton`/pedestrian; IGN BD TOPO data; **5 requests per second per IP** |
+| Car | Same API | Shortest or fastest, with exclusions; same rate limit |
+| Bike | Not in the IGN API. Self-host **Valhalla** (MIT) or OpenRouteService on OSM data | Engines verified to exist and be open source; hosting effort not measured |
+| Public transport | Timetable data from transport.data.gouv.fr (national access point) plus a self-hosted **OpenTripPlanner** or **MOTIS** | Data is open; no fully open-source French transit API was found, Navitia remains an option |
+| Any mode, zero cost to us | Deep link to the user's own navigation app (`navigation-links.ts`) | Already implemented |
+
+Risks to size with a load test: the 5 requests per second per IP limit is shared by all
+citizens behind one proxy, so a server-side cache and rate limit are needed; the usage terms
+of `data.geopf.fr` for a high-traffic public site were **not verified**.
+
 ## 5. Data to retrieve and store per office (for GPS, photos, accessibility)
 
 | Data | Why | Notes |
@@ -107,6 +146,24 @@ Ordered from cheapest to most costly:
 
 Whatever the choice: **the GPS hand-off is done with deep links**, so no routing API, no key,
 no tracking, and it works on any phone. Provide an `.ics` "add to calendar" file as well.
+
+### 6.1 Users with a weak network and old equipment
+
+A share of the citizens is in a fragile situation: poor mobile coverage, an old phone or an
+old computer, little digital habit. This weighs more than any provider choice.
+
+- **Design list first.** Address, phone number, opening times and booking must work without
+  the map. The map is an extra loaded on request.
+- **Prefer raster tiles (Leaflet) to vector tiles (MapLibre).** Vector maps need WebGL, which
+  old devices may lack or run badly. IGN also serves raster WMTS tiles that Leaflet can show.
+- **The Angular app itself is a risk.** The build targets ES2022 and recent browsers by
+  default, so a very old phone may not start it. Test on real old devices; keep a plain HTML
+  fallback (agency list, addresses, phone numbers) and a phone booking route.
+- **Budget the page weight** and measure it with a throttled network (3G) and a slowed CPU.
+  The production build currently reports about 80 kB transferred for the initial bundle,
+  before the map code and tiles; the budget value is to be agreed with the client.
+- **No account, short forms, plain language**, large touch targets, and no dependency on a
+  third-party script for the essential path.
 
 ## 7. Open questions for the stakeholders
 

@@ -8,8 +8,14 @@ const office: Office = {
 describe('navigationLinks', () => {
   const links = navigationLinks(office);
 
-  it('uses lat,lng in every link', () => {
-    for (const l of links) expect(l.href).toContain('45.76,4.85');
+  it('uses lat,lng in every link (Microsoft links use lat_lng)', () => {
+    for (const l of links.filter((l) => !l.label.includes('Bing') && !l.label.includes('Windows'))) {
+      expect(l.href).toContain('45.76,4.85');
+    }
+  });
+  it('offers Microsoft links with the destination', () => {
+    expect(links.find((l) => l.label.includes('Bing'))?.href).toContain('rtp=~pos.45.76_4.85_Agence%20Test');
+    expect(links.find((l) => l.label.includes('Windows'))?.href.startsWith('bingmaps:')).toBe(true);
   });
   it('offers Android geo: and https links for the main apps', () => {
     expect(links.find((l) => l.label.startsWith('Android'))?.href.startsWith('geo:')).toBe(true);

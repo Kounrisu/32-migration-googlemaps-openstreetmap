@@ -32,6 +32,9 @@ npm run build
 - `mapProvider` in `public/config.json` (`"osm"` or `"google"`) selects the map for the whole app.
   Flipping it back is the rollback path.
 - `/compare` shows both maps side by side on the same data and selection.
+- `/analysis` presents the stakeholders and their needs, which option covers which need
+  (walk, bike, transit, car included) and what comparable organisations use. Source data in
+  `src/app/features/analysis/analysis-data.ts`, written up in `docs/07`.
 - Google needs an API key. Copy `public/config.local.example.json` to
   `public/config.local.json` (gitignored, never commit it: this repo is public) and set
   `googleApiKey`. Without a key Google shows its "development purposes only" error.

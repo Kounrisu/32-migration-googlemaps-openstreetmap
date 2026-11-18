@@ -20,18 +20,51 @@
   </ul>
 }
 
-<div class="layout">
-  <ul class="offices" aria-label="Offices">
-    @for (o of list(); track o.id) {
-      <li [class.selected]="o.id === selectedId()">
-        <button type="button" class="pick" (click)="selectedId.set(o.id)" [attr.aria-pressed]="o.id === selectedId()">
-          <strong>{{ o.name }}</strong>
-          <span>{{ o.address }}, {{ o.city }}</span>
-          @if (o.distanceKm !== undefined) { <span class="dist">{{ o.distanceKm.toFixed(0) }} km</span> }
-        </button>
-        <a [routerLink]="['/book', o.id]">Choose a slot<span class="sr"> at {{ o.name }}</span></a>
-      </li>
-    }
-  </ul>
+<div class="scroll" role="region" aria-label="Offices table" tabindex="0">
+  <table class="offices">
+    <caption>
+      @if (origin()) { Offices sorted by distance from {{ query() || 'your position' }} } @else { Offices, in no particular order }
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Office</th>
+        <th scope="col">Address</th>
+        <th scope="col">Distance</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (o of list(); track o.id) {
+        <tr [class.selected]="o.id === selectedId()">
+          <th scope="row">{{ o.name }}</th>
+          <td>{{ o.address }}, {{ o.city }}</td>
+          <td class="dist">
+            @if (o.distanceKm !== undefined) { {{ o.distanceKm.toFixed(0) }} km } @else { <span aria-hidden="true">&ndash;</span><span class="sr">Not available: enter an address or use your position</span> }
+          </td>
+          <td class="actions">
+            <button type="button" class="secondary" (click)="selectedId.set(o.id)" [attr.aria-pressed]="o.id === selectedId()">
+              Show on map<span class="sr"> {{ o.name }}</span>
+            </button>
+            <a [routerLink]="['/book', o.id]">Choose a slot<span class="sr"> at {{ o.name }}</span></a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="map-wrap">
   <app-office-map [offices]="list()" [selectedId]="selectedId()" [user]="origin()" (officeSelected)="selectedId.set($event)" />
 </div>
+
+@if (selected(); as o) {
+  <section class="getting-there" aria-labelledby="gt">
+    <h2 id="gt">Directions to {{ o.name }}</h2>
+    <p>{{ o.address }}, {{ o.city }}. Choose your own navigation app: walking, cycling, public transport or car are set there.</p>
+    <ul>
+      @for (l of links(); track l.label) {
+        <li><a [href]="l.href">{{ l.label }}<span class="sr"> (opens your navigation app or a new page)</span></a></li>
+      }
+    </ul>
+  </section>
+}
