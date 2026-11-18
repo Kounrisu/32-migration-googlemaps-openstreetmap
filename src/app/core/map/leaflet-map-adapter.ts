@@ -13,6 +13,9 @@ export class LeafletMapAdapter implements MapAdapter {
   private layer = L.layerGroup();
   private markers = new Map<string, L.Marker>();
   private user?: L.CircleMarker;
+  private resizer?: ResizeObserver;
+  private fitted: LatLng[] = [];
+  private refitDone = false;
   private clickHandler: (id: string) => void = () => undefined;
 
   constructor(private readonly config: AppConfig) {}
@@ -29,6 +32,16 @@ export class LeafletMapAdapter implements MapAdapter {
       attribution: this.config.tileAttribution,
     }).addTo(this.map);
     this.layer.addTo(this.map);
+    // The container may be laid out after the map is created (flex/grid, lazy route): re-measure
+    // whenever its size changes, otherwise fitBounds computes a zoom for a 0 px map.
+    this.resizer = new ResizeObserver(() => {
+      this.map?.invalidateSize();
+      if (!this.refitDone && container.clientHeight > 0 && this.fitted.length) {
+        this.refitDone = true;
+        this.fitTo(this.fitted);
+      }
+    });
+    this.resizer.observe(container);
   }
 
   setMarkers(markers: MapMarker[]): void {
@@ -60,6 +73,8 @@ export class LeafletMapAdapter implements MapAdapter {
 
   fitTo(positions: LatLng[]): void {
     if (!this.map || positions.length === 0) return;
+    this.fitted = positions;
+    this.map.invalidateSize();
     this.map.fitBounds(L.latLngBounds(positions.map((p) => [p.lat, p.lng] as [number, number])), {
       padding: [32, 32],
       maxZoom: 14,
@@ -79,6 +94,7 @@ export class LeafletMapAdapter implements MapAdapter {
   }
 
   destroy(): void {
+    this.resizer?.disconnect();
     this.map?.remove();
     this.map = undefined;
     this.markers.clear();
