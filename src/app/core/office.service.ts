@@ -1,16 +1,22 @@
 import { Injectable, signal } from '@angular/core';
 import { LatLng, Office, Slot } from './models';
+import { around } from './surroundings';
+
+const FACADE = {
+  src: 'img/facade-exemple.svg',
+  alt: 'Illustration d’exemple : façade d’une agence avec une porte vitrée à gauche et une enseigne bleue au-dessus.',
+};
 
 /** Fictional demo data. A real build swaps this for the back-end API (same shapes). */
 const OFFICES: Office[] = [
-  { id: 'par', name: 'Agence Paris Centre', address: '12 rue de Rivoli', city: 'Paris', position: { lat: 48.8559, lng: 2.3522 }, phone: '01 00 00 00 01', accessInfo: 'Step-free entrance on the courtyard side. Metro line 1, 2 min walk. No public parking on site.' },
-  { id: 'lyo', name: 'Agence Lyon Part-Dieu', address: '8 cours Lafayette', city: 'Lyon', position: { lat: 45.7603, lng: 4.8544 }, phone: '04 00 00 00 02', accessInfo: 'Entrance next to the tram stop. Lift to the 2nd floor, reception on the left.' },
-  { id: 'mrs', name: 'Agence Marseille Vieux-Port', address: '3 quai du Port', city: 'Marseille', position: { lat: 43.2951, lng: 5.3744 }, phone: '04 00 00 00 03' },
-  { id: 'lil', name: 'Agence Lille Flandres', address: '21 rue Faidherbe', city: 'Lille', position: { lat: 50.6366, lng: 3.0707 }, phone: '03 00 00 00 04' },
-  { id: 'bdx', name: 'Agence Bordeaux Saint-Jean', address: '5 rue Sainte-Catherine', city: 'Bordeaux', position: { lat: 44.8402, lng: -0.5744 }, phone: '05 00 00 00 05' },
-  { id: 'nan', name: 'Agence Nantes Commerce', address: '14 rue Crébillon', city: 'Nantes', position: { lat: 47.2131, lng: -1.5593 }, phone: '02 00 00 00 06' },
-  { id: 'str', name: 'Agence Strasbourg Kléber', address: '2 place Kléber', city: 'Strasbourg', position: { lat: 48.5846, lng: 7.7507 }, phone: '03 00 00 00 07' },
-  { id: 'tls', name: 'Agence Toulouse Capitole', address: '9 rue du Taur', city: 'Toulouse', position: { lat: 43.6045, lng: 1.4442 }, phone: '05 00 00 00 08' },
+  { id: 'par', name: 'Agence Paris Centre', address: '12 rue de Rivoli', postalCode: '75001', city: 'Paris', region: 'Île-de-France', country: 'France', position: { lat: 48.8559, lng: 2.3522 }, phone: '01 00 00 00 01', accessInfo: 'Entrée de plain-pied côté cour. Métro ligne 1 à 2 minutes à pied. Pas de parking public sur place.', photo: FACADE, surroundings: around('rue de Rivoli', 'rue du Louvre', 8, 'Métro') },
+  { id: 'lyo', name: 'Agence Lyon Part-Dieu', address: '8 cours Lafayette', postalCode: '69003', city: 'Lyon', region: 'Auvergne-Rhône-Alpes', country: 'France', position: { lat: 45.7603, lng: 4.8544 }, phone: '04 00 00 00 02', accessInfo: 'Entrée à côté de l’arrêt de tram. Ascenseur jusqu’au 2e étage, accueil sur la gauche.', photo: FACADE, surroundings: around('cours Lafayette', 'rue Paul Bert', 80, 'Tram') },
+  { id: 'mrs', name: 'Agence Marseille Vieux-Port', address: '3 quai du Port', postalCode: '13002', city: 'Marseille', region: 'Provence-Alpes-Côte d’Azur', country: 'France', position: { lat: 43.2951, lng: 5.3744 }, phone: '04 00 00 00 03', surroundings: around('quai du Port', 'rue de la République', 20, 'Métro') },
+  { id: 'lil', name: 'Agence Lille Flandres', address: '21 rue Faidherbe', postalCode: '59000', city: 'Lille', region: 'Hauts-de-France', country: 'France', position: { lat: 50.6366, lng: 3.0707 }, phone: '03 00 00 00 04', surroundings: around('rue Faidherbe', 'rue de Béthune', 100, 'Métro') },
+  { id: 'bdx', name: 'Agence Bordeaux Saint-Jean', address: '5 rue Sainte-Catherine', postalCode: '33000', city: 'Bordeaux', region: 'Nouvelle-Aquitaine', country: 'France', position: { lat: 44.8402, lng: -0.5744 }, phone: '05 00 00 00 05', surroundings: around('rue Sainte-Catherine', 'cours d’Alsace-et-Lorraine', -15, 'Tram') },
+  { id: 'nan', name: 'Agence Nantes Commerce', address: '14 rue Crébillon', postalCode: '44000', city: 'Nantes', region: 'Pays de la Loire', country: 'France', position: { lat: 47.2131, lng: -1.5593 }, phone: '02 00 00 00 06', surroundings: around('rue Crébillon', 'rue de Strasbourg', 50, 'Tram') },
+  { id: 'str', name: 'Agence Strasbourg Kléber', address: '2 place Kléber', postalCode: '67000', city: 'Strasbourg', region: 'Grand Est', country: 'France', position: { lat: 48.5846, lng: 7.7507 }, phone: '03 00 00 00 07', surroundings: around('place Kléber', 'rue des Grandes Arcades', 0, 'Tram') },
+  { id: 'tls', name: 'Agence Toulouse Capitole', address: '9 rue du Taur', postalCode: '31000', city: 'Toulouse', region: 'Occitanie', country: 'France', position: { lat: 43.6045, lng: 1.4442 }, phone: '05 00 00 00 08', surroundings: around('rue du Taur', 'rue des Changes', 35, 'Métro') },
 ];
 
 /** Haversine distance in km. Replaces `google.maps.geometry.spherical.computeDistanceBetween`. */

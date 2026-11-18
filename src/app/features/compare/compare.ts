@@ -9,12 +9,12 @@ import { OfficeMap } from '../find-office/office-map';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [OfficeMap],
   template: `
-    <h1>Google Maps vs OpenStreetMap</h1>
-    <p class="lead">Same data, same adapter interface. Click a marker on either map: both follow.</p>
+    <h1>Google Maps et OpenStreetMap</h1>
+    <p class="lead">Mêmes données, même interface d’adaptateur. Cliquez sur une épingle de l’une ou l’autre carte : les deux suivent.</p>
     @if (!hasKey) {
       <p class="note" role="note">
-        No Google API key found: the Google map runs in Google's "development purposes only" mode.
-        Put a key in <code>public/config.local.json</code> (see README) to see it as in production.
+        Aucune clé d’API Google trouvée : la carte Google fonctionne en mode « développement uniquement ».
+        Mettez une clé dans <code>public/config.local.json</code> (voir le README) pour la voir comme en production.
       </p>
     }
     <div class="pair">

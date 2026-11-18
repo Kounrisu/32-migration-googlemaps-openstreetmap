@@ -65,9 +65,9 @@ export interface Option {
 
 export const OPTIONS: Option[] = [
   { key: 'google', label: 'Google Maps Platform' },
-  { key: 'osm', label: 'Leaflet + tuiles OSM publiques' },
+  { key: 'osm', label: 'OpenStreetMap : tuiles publiques + Leaflet' },
   { key: 'ign', label: 'Géoplateforme IGN (cartes.gouv.fr)' },
-  { key: 'self', label: 'Pile OSM auto-hébergée' },
+  { key: 'self', label: 'OpenStreetMap : pile auto-hébergée' },
   { key: 'link', label: 'Lien vers l’application de navigation de l’utilisateur' },
 ];
 

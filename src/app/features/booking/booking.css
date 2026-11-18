@@ -1,6 +1,7 @@
 fieldset { border: 1px solid #cbd5e1; border-radius: 8px; margin: 0 0 16px; padding: 12px 16px; }
 legend { font-weight: 700; padding: 0 6px; }
-h2 { font-size: 1rem; margin: 12px 0 6px; text-transform: capitalize; }
+h2 { font-size: 1rem; margin: 12px 0 6px; }
+h2::first-letter { text-transform: uppercase; }
 .slots { display: flex; flex-wrap: wrap; gap: 6px; }
 .slots button { background: #fff; color: #1d4ed8; border: 1px solid #1d4ed8; padding: 6px 10px; }
 .slots button[aria-pressed='true'] { background: #1d4ed8; color: #fff; }

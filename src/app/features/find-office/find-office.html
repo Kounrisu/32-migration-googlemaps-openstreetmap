@@ -1,70 +1,160 @@
-<h1>Book an appointment</h1>
-<p class="lead">Find the nearest office, then choose a time slot.</p>
+<h1>Trouver l’agence la plus proche</h1>
+<p class="lead">Dites-nous où vous êtes : nous vous montrons l’agence la plus proche, puis vous prenez rendez-vous.</p>
 
-<form class="search" role="search" (ngSubmit)="search()">
-  <label for="addr">Your address or city</label>
+<section class="card" aria-labelledby="t-where">
+  <h2 id="t-where">Où êtes-vous ?</h2>
+
+  <form role="search" (ngSubmit)="search()">
+    <label for="addr">Votre adresse, code postal ou ville</label>
+    <p id="addr-help" class="hint">Par exemple : « 8 cours Lafayette Lyon », « 69003 » ou « Nantes ».</p>
+    <div class="row">
+      <input id="addr" name="addr" type="search" enterkeyhint="search" autocomplete="street-address" aria-describedby="addr-help" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+      <button type="submit">Rechercher</button>
+    </div>
+  </form>
+
+  <p class="or">ou</p>
   <div class="row">
-    <input id="addr" name="addr" type="search" autocomplete="street-address" [ngModel]="query()" (ngModelChange)="query.set($event)" />
-    <button type="submit">Search</button>
-    <button type="button" class="secondary" (click)="locate()">Use my position</button>
+    <button type="button" class="secondary" (click)="locate()">Me localiser avec mon appareil</button>
+    <button type="button" class="secondary" (click)="openMap(true)">Cliquer sur la carte</button>
   </div>
-</form>
+  <p class="hint">Votre position n’est demandée que si vous cliquez sur « Me localiser ». Elle n’est ni enregistrée, ni envoyée à un tiers.</p>
 
-<p class="status" role="status" aria-live="polite">{{ status() }}</p>
+  <p class="status" role="status" aria-live="polite">{{ status() }}</p>
 
-@if (suggestions().length) {
-  <ul class="suggestions" aria-label="Address suggestions">
-    @for (s of suggestions(); track s.label) {
-      <li><button type="button" (click)="pick(s)">{{ s.label }}</button></li>
-    }
-  </ul>
-}
+  @if (suggestions().length) {
+    <div class="others">
+      <p id="others-title">D’autres adresses correspondent :</p>
+      <ul aria-labelledby="others-title">
+        @for (s of suggestions(); track s.label) {
+          <li><button type="button" (click)="pick(s)">{{ s.label }}</button></li>
+        }
+      </ul>
+    </div>
+  }
 
-<div class="scroll" role="region" aria-label="Offices table" tabindex="0">
-  <table class="offices">
-    <caption>
-      @if (origin()) { Offices sorted by distance from {{ query() || 'your position' }} } @else { Offices, in no particular order }
-    </caption>
-    <thead>
-      <tr>
-        <th scope="col">Office</th>
-        <th scope="col">Address</th>
-        <th scope="col">Distance</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (o of list(); track o.id) {
-        <tr [class.selected]="o.id === selectedId()">
-          <th scope="row">{{ o.name }}</th>
-          <td>{{ o.address }}, {{ o.city }}</td>
-          <td class="dist">
-            @if (o.distanceKm !== undefined) { {{ o.distanceKm.toFixed(0) }} km } @else { <span aria-hidden="true">&ndash;</span><span class="sr">Not available: enter an address or use your position</span> }
-          </td>
-          <td class="actions">
-            <button type="button" class="secondary" (click)="selectedId.set(o.id)" [attr.aria-pressed]="o.id === selectedId()">
-              Show on map<span class="sr"> {{ o.name }}</span>
-            </button>
-            <a [routerLink]="['/book', o.id]">Choose a slot<span class="sr"> at {{ o.name }}</span></a>
-          </td>
-        </tr>
+  <fieldset class="filters">
+    <legend>Ou choisir un lieu</legend>
+    <div class="row">
+      @if (countries().length > 1) {
+        <div class="field">
+          <label for="f-country">Pays</label>
+          <select id="f-country" name="country" [ngModel]="country()" (ngModelChange)="setCountry($event)">
+            <option value="">Tous</option>
+            @for (c of countries(); track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+        </div>
       }
-    </tbody>
-  </table>
-</div>
-
-<div class="map-wrap">
-  <app-office-map [offices]="list()" [selectedId]="selectedId()" [user]="origin()" (officeSelected)="selectedId.set($event)" />
-</div>
+      <div class="field">
+        <label for="f-region">Région</label>
+        <select id="f-region" name="region" [ngModel]="region()" (ngModelChange)="setRegion($event)">
+          <option value="">Toutes</option>
+          @for (r of regions(); track r) { <option [value]="r">{{ r }}</option> }
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-city">Ville</label>
+        <select id="f-city" name="city" [ngModel]="city()" (ngModelChange)="city.set($event)">
+          <option value="">Toutes</option>
+          @for (c of cities(); track c) { <option [value]="c">{{ c }}</option> }
+        </select>
+      </div>
+      <button type="button" class="secondary" (click)="clearFilters()" [disabled]="!filtersActive()">Effacer le filtre</button>
+    </div>
+  </fieldset>
+</section>
 
 @if (selected(); as o) {
-  <section class="getting-there" aria-labelledby="gt">
-    <h2 id="gt">Directions to {{ o.name }}</h2>
-    <p>{{ o.address }}, {{ o.city }}. Choose your own navigation app: walking, cycling, public transport or car are set there.</p>
-    <ul>
-      @for (l of links(); track l.label) {
-        <li><a [href]="l.href">{{ l.label }}<span class="sr"> (opens your navigation app or a new page)</span></a></li>
-      }
-    </ul>
+  <section class="card agency" aria-labelledby="agencyTitle">
+    <h2 id="agencyTitle" #agencyTitle tabindex="-1">{{ isNearest() ? 'Votre agence la plus proche' : 'Agence choisie' }} : {{ o.name }}</h2>
+    <div class="agency-grid">
+      <div>
+        <p class="addr">{{ o.address }}<br />{{ o.postalCode }} {{ o.city }}</p>
+        @if (o.distanceKm !== undefined) {
+          <p class="dist">Distance depuis {{ originLabel() }} : {{ distance(o) }}</p>
+        }
+        <p>Téléphone : <a [href]="'tel:' + phoneHref(o)">{{ o.phone }}</a></p>
+        @if (o.accessInfo) { <p><strong>Accès :</strong> {{ o.accessInfo }}</p> }
+        <p><a class="btn" [routerLink]="['/book', o.id]">Prendre rendez-vous<span class="sr"> à {{ o.name }}</span></a></p>
+
+        <div class="nav-box">
+          <label for="navapp">Mon application de navigation</label>
+          <select id="navapp" name="navapp" [ngModel]="navApp()" (ngModelChange)="setNavApp($event)">
+            @for (l of navLinks(); track l.id) { <option [value]="l.id">{{ l.label }}</option> }
+          </select>
+          @if (chosenLink(); as c) {
+            <p><a class="btn alt" [href]="c.href">Y aller avec {{ c.label }}<span class="sr"> (ouvre votre application ou une nouvelle page)</span></a></p>
+          }
+          <p class="hint">Le mode de déplacement (à pied, à vélo, en transports, en voiture) se choisit dans votre application. Votre choix est gardé sur cet appareil seulement.</p>
+        </div>
+      </div>
+
+      <div>
+        @if (o.photo; as p) {
+          <figure class="photo">
+            <img [src]="p.src" [alt]="p.alt" width="480" height="270" loading="lazy" />
+            <figcaption>L’agence vue de la rue</figcaption>
+          </figure>
+        } @else {
+          <p class="hint">Pas de photo disponible pour cette agence.</p>
+        }
+        <app-office-sketch [office]="o" />
+      </div>
+    </div>
   </section>
 }
+
+<section class="card" aria-labelledby="mapTitle">
+  <h2 id="mapTitle" #mapTitle tabindex="-1">La carte</h2>
+  @if (!showMap()) {
+    <p>La carte est facultative : tout se trouve aussi dans le tableau plus bas. Elle ne se charge que si vous la demandez, ce qui économise votre connexion.</p>
+    <button type="button" (click)="openMap(false)">Afficher la carte</button>
+  } @else {
+    <p id="map-help" class="hint">Cliquez sur la carte pour indiquer où vous êtes, ou sur une épingle bleue pour choisir une agence. Les mêmes agences sont dans le tableau.</p>
+    <div class="row map-tools">
+      <button type="button" class="secondary" (click)="bigMap.set(!bigMap())" [attr.aria-expanded]="bigMap()">{{ bigMap() ? 'Réduire la carte' : 'Agrandir la carte' }}</button>
+      <button type="button" class="secondary" (click)="showMap.set(false); bigMap.set(false)">Masquer la carte</button>
+    </div>
+    <div class="map-wrap" [class.big]="bigMap()">
+      <app-office-map [offices]="list()" [selectedId]="selectedId()" [user]="origin()" (officeSelected)="onMarker($event)" (pointPicked)="onPointPicked($event)" />
+    </div>
+  }
+</section>
+
+<section aria-labelledby="t-all">
+  <h2 id="t-all">Toutes les agences ({{ list().length }})</h2>
+  @if (list().length) {
+    <div class="scroll" role="region" aria-label="Tableau des agences, défilement possible" tabindex="0">
+      <table class="offices">
+        <caption>
+          @if (origin()) { Agences triées par distance depuis {{ originLabel() }} } @else { Agences classées par ville }
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Agence</th>
+            <th scope="col">Adresse</th>
+            <th scope="col">Distance</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of list(); track o.id) {
+            <tr [class.selected]="o.id === selectedId()" [attr.aria-current]="o.id === selectedId() ? 'true' : null">
+              <th scope="row">{{ o.name }}</th>
+              <td>{{ o.address }}, {{ o.postalCode }} {{ o.city }}<br /><span class="region">{{ o.region }}</span></td>
+              <td class="dist">
+                @if (o.distanceKm !== undefined) { {{ distance(o) }} } @else { <span aria-hidden="true">&ndash;</span><span class="sr">Non calculée : indiquez où vous êtes</span> }
+              </td>
+              <td class="actions">
+                <button type="button" class="secondary" (click)="choose(o.id)">Voir cette agence<span class="sr"> : {{ o.name }}</span></button>
+                <a [routerLink]="['/book', o.id]">Rendez-vous<span class="sr"> à {{ o.name }}</span></a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p>Aucune agence ne correspond à ce filtre. <button type="button" class="secondary" (click)="clearFilters()">Effacer le filtre</button></p>
+  }
+</section>

@@ -1,35 +1,35 @@
 @if (office(); as o) {
-  <p><a routerLink="/">&larr; Back to offices</a></p>
+  <p><a routerLink="/">&larr; Retour aux agences</a></p>
   <h1>{{ o.name }}</h1>
-  <p>{{ o.address }}, {{ o.city }} &middot; {{ o.phone }}</p>
+  <p>{{ o.address }}, {{ o.postalCode }} {{ o.city }} &middot; <a [href]="'tel:' + o.phone.replace(' ', '')">{{ o.phone }}</a></p>
 
   @if (confirmation(); as c) {
     <section class="done" role="status">
-      <h2>Appointment confirmed</h2>
-      <p>Reference <strong>{{ c.reference }}</strong>. A confirmation would be sent to {{ email() }}.</p>
+      <h2>Rendez-vous confirmé</h2>
+      <p>Référence <strong>{{ c.reference }}</strong>. Une confirmation serait envoyée à {{ email() }}.</p>
     </section>
     <section class="getting-there" aria-labelledby="gt">
-      <h2 id="gt">Getting there</h2>
-      <p>{{ o.address }}, {{ o.city }}</p>
+      <h2 id="gt">Comment s’y rendre</h2>
+      <p>{{ o.address }}, {{ o.postalCode }} {{ o.city }}</p>
       @if (o.photo; as p) { <img [src]="p.src" [alt]="p.alt" width="480" height="270" loading="lazy" /> }
       @if (o.accessInfo) { <p>{{ o.accessInfo }}</p> }
-      <p>Open directions in your own navigation app:</p>
+      <p>Ouvrez l’itinéraire dans votre propre application de navigation :</p>
       <ul>
-        @for (l of links(); track l.label) {
-          <li><a [href]="l.href">{{ l.label }}<span class="sr"> (opens your navigation app or a new page)</span></a></li>
+        @for (l of links(); track l.id) {
+          <li><a [href]="l.href">{{ l.label }}<span class="sr"> (ouvre votre application ou une nouvelle page)</span></a></li>
         }
       </ul>
     </section>
   } @else {
     <form (ngSubmit)="submit()">
       <fieldset>
-        <legend>1. Choose a slot</legend>
+        <legend>1. Choisissez un créneau</legend>
         @for (d of days(); track d.key) {
           <h2>{{ d.date | date: 'fullDate' }}</h2>
           <div class="slots">
             @for (s of d.slots; track s.id) {
               <button type="button" [disabled]="!s.available" [attr.aria-pressed]="chosen()?.id === s.id" (click)="chosen.set(s)">
-                {{ s.start | date: 'HH:mm' }}
+                {{ s.start | date: 'HH:mm' }}<span class="sr">{{ s.available ? '' : ' (indisponible)' }}</span>
               </button>
             }
           </div>
@@ -37,16 +37,16 @@
       </fieldset>
 
       <fieldset>
-        <legend>2. Your details</legend>
-        <label for="n">Full name</label>
+        <legend>2. Vos coordonnées</legend>
+        <label for="n">Nom et prénom</label>
         <input id="n" name="n" autocomplete="name" required [ngModel]="fullName()" (ngModelChange)="fullName.set($event)" />
-        <label for="e">Email</label>
+        <label for="e">Adresse e-mail</label>
         <input id="e" name="e" type="email" autocomplete="email" required [ngModel]="email()" (ngModelChange)="email.set($event)" />
       </fieldset>
 
-      <button type="submit" [disabled]="!chosen()">Confirm appointment</button>
+      <button type="submit" [disabled]="!chosen()">Confirmer le rendez-vous</button>
     </form>
   }
 } @else {
-  <p>Unknown office. <a routerLink="/">Back to offices</a></p>
+  <p>Agence inconnue. <a routerLink="/">Retour aux agences</a></p>
 }

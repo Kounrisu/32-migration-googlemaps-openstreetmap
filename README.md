@@ -31,6 +31,10 @@ npm run build
 
 - `mapProvider` in `public/config.json` (`"osm"` or `"google"`) selects the map for the whole app.
   Flipping it back is the rollback path.
+- `/` is the citizen page, in French: address, postcode or city search, "locate me", click on the
+  map, filters by country/region/city, the nearest agency with photo, a light SVG plan (compass,
+  streets, post office, bakery, town hall, transport) and a "my navigation app" hand-off. The map
+  is optional and only started on request; everything is also in the table.
 - `/compare` shows both maps side by side on the same data and selection.
 - `/analysis` presents the stakeholders and their needs, which option covers which need
   (walk, bike, transit, car included) and what comparable organisations use. Source data in

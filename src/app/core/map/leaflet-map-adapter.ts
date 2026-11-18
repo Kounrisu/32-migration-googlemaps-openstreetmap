@@ -93,6 +93,11 @@ export class LeafletMapAdapter implements MapAdapter {
     this.clickHandler = handler;
   }
 
+  onMapClick(handler: (position: LatLng) => void): void {
+    // Marker clicks do not bubble to the map in Leaflet, so this only fires on empty ground.
+    this.map?.on('click', (e: L.LeafletMouseEvent) => handler({ lat: e.latlng.lat, lng: e.latlng.lng }));
+  }
+
   destroy(): void {
     this.resizer?.disconnect();
     this.map?.remove();

@@ -103,7 +103,7 @@ export class GoogleMapAdapter implements MapAdapter {
       this.user = new google.maps.Marker({
         map: this.map,
         position,
-        title: 'Your position',
+        title: 'Votre position',
         icon: { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#16a34a', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 },
       });
     }
@@ -111,6 +111,12 @@ export class GoogleMapAdapter implements MapAdapter {
 
   onMarkerClick(handler: (id: string) => void): void {
     this.clickHandler = handler;
+  }
+
+  onMapClick(handler: (position: LatLng) => void): void {
+    this.map?.addListener('click', (e: google.maps.MapMouseEvent) => {
+      if (e.latLng) handler({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+    });
   }
 
   destroy(): void {

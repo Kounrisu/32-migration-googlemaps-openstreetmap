@@ -137,6 +137,9 @@ import {
     th, td { border-bottom: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; vertical-align: top; }
     thead th { background: #f1f5f9; }
     tbody th { font-weight: 600; }
+    .matrix tbody th, .matrix thead th:first-child { position: sticky; left: 0; background: #fff; min-width: 150px; box-shadow: 1px 0 0 #e2e8f0; }
+    .matrix thead th:first-child { background: #f1f5f9; z-index: 1; }
+    .matrix thead th { min-width: 110px; }
     .matrix td.lvl { text-align: center; font-size: 1.1rem; white-space: nowrap; }
     .lvl-yes { color: #15803d; }
     .lvl-partial { color: #b45309; }

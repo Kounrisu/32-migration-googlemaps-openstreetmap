@@ -7,19 +7,19 @@ import { MapAdapter } from '../../core/map/map-adapter';
 /**
  * Provider-agnostic map component. Replaces the `<google-map>` / `<map-marker>` pair.
  * `provider` defaults to `mapProvider` from config.json; the compare page overrides it to show
- * both side by side. Everything on the map is also in the office list beside it
- * (docs/04-accessibility-and-privacy.md), so the map carries no information of its own.
+ * both side by side. Everything on the map is also in the office table, so the map carries no
+ * information of its own (docs/04-accessibility-and-privacy.md).
  */
 @Component({
   selector: 'app-office-map',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div #host class="map" role="application" [attr.aria-label]="'Map of offices (' + resolved + '). The same offices are listed beside the map.'"></div>
+    <div #host class="map" role="region" [attr.aria-label]="'Carte des agences (' + resolved + '). Les mêmes agences sont dans le tableau.'"></div>
     @if (error()) { <p class="err" role="alert">{{ error() }}</p> }
   `,
   styles: `
-    :host { display: block; position: relative; height: 100%; min-height: 320px; }
-    .map { height: 100%; min-height: 320px; border-radius: 8px; }
+    :host { display: block; position: relative; height: 100%; min-height: 280px; }
+    .map { height: 100%; min-height: 280px; border-radius: 8px; }
     .err { position: absolute; inset: auto 8px 8px 8px; background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 6px; padding: 8px; margin: 0; z-index: 1000; }
   `,
 })
@@ -29,6 +29,8 @@ export class OfficeMap {
   readonly user = input<LatLng | null>(null);
   readonly provider = input<MapProvider | undefined>(undefined);
   readonly officeSelected = output<string>();
+  /** A click on empty ground: the citizen tells us where they are. */
+  readonly pointPicked = output<LatLng>();
 
   protected readonly error = signal('');
   private readonly cfg = inject(ConfigService);
@@ -37,8 +39,8 @@ export class OfficeMap {
   private adapter?: MapAdapter;
   private destroyed = false;
 
-  protected get resolved(): MapProvider {
-    return this.provider() ?? this.cfg.config.mapProvider;
+  protected get resolved(): string {
+    return (this.provider() ?? this.cfg.config.mapProvider) === 'google' ? 'Google' : 'OpenStreetMap';
   }
 
   constructor() {
@@ -68,15 +70,16 @@ export class OfficeMap {
   }
 
   private async start(): Promise<void> {
-    const adapter = createMapAdapter(this.resolved, this.cfg.config);
+    const adapter = createMapAdapter(this.provider() ?? this.cfg.config.mapProvider, this.cfg.config);
     try {
       await adapter.init(this.host().nativeElement);
     } catch {
-      this.error.set(`The ${this.resolved === 'google' ? 'Google' : 'OpenStreetMap'} map could not be loaded. The office list still works.`);
+      this.error.set(`La carte ${this.resolved} n’a pas pu être chargée. Le tableau des agences fonctionne toujours.`);
       return;
     }
     if (this.destroyed) return adapter.destroy();
     adapter.onMarkerClick((id) => this.officeSelected.emit(id));
+    adapter.onMapClick((p) => this.pointPicked.emit(p));
     this.adapter = adapter;
     this.ready.set(true);
   }

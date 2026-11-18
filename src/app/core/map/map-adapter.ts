@@ -23,5 +23,7 @@ export interface MapAdapter {
   fitTo(positions: LatLng[]): void;
   setUserPosition(position: LatLng | null): void;
   onMarkerClick(handler: (id: string) => void): void;
+  /** Called with the clicked point, so a citizen can say "I am here" by clicking the map. */
+  onMapClick(handler: (position: LatLng) => void): void;
   destroy(): void;
 }
