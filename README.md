@@ -27,6 +27,18 @@ npm run build
 
 `.npmrc` sets `legacy-peer-deps=true`, as in the sibling Angular projects.
 
+## Google vs OpenStreetMap in the same app
+
+- `mapProvider` in `public/config.json` (`"osm"` or `"google"`) selects the map for the whole app.
+  Flipping it back is the rollback path.
+- `/compare` shows both maps side by side on the same data and selection.
+- Google needs an API key. Copy `public/config.local.example.json` to
+  `public/config.local.json` (gitignored, never commit it: this repo is public) and set
+  `googleApiKey`. Without a key Google shows its "development purposes only" error.
+- Restrict the key to `http://localhost:4200/*` and the Maps JavaScript API, and cap the quota
+  and set a budget alert in Google Cloud so a test can never be billed.
+- With `mapProvider: "osm"` the Google SDK is never requested.
+
 ## Reading order
 
 1. [docs/01-scope.md](docs/01-scope.md): what the app does and where the map sits in it

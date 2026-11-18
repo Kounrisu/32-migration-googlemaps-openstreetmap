@@ -12,4 +12,5 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 /* Map markers (CSS-only, no image assets) */
 .office-pin span { display: block; width: 22px; height: 22px; margin: 3px; background: #1d4ed8; border: 2px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 1px 4px rgb(0 0 0 / 0.4); }
 .office-pin.is-selected span { background: #dc2626; transform: rotate(-45deg) scale(1.25); }
+.user-dot-html { width: 16px; height: 16px; background: #16a34a; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 1px 4px rgb(0 0 0 / 0.4); }
 .user-dot { fill: #16a34a; stroke: #fff; fill-opacity: 1; }

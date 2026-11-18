@@ -10,13 +10,13 @@ export interface MapMarker {
 /**
  * The ONLY map surface the rest of the app knows about.
  *
- * Google Maps -> OpenStreetMap is the migration at hand, but the same seam makes the next
- * change (MapLibre vector tiles, a sovereign tile provider...) a one-file swap instead of a
- * rewrite. Components depend on this interface; `LeafletMapAdapter` is the single place that
- * imports `leaflet`.
+ * Components depend on this interface; `LeafletMapAdapter` (OpenStreetMap) and
+ * `GoogleMapAdapter` are the only files importing a map SDK. Choosing which one runs is a
+ * config switch (`mapProvider`), which is also the rollback path of the migration.
  */
 export interface MapAdapter {
-  init(container: HTMLElement): void;
+  /** May load an SDK over the network, hence async. */
+  init(container: HTMLElement): void | Promise<void>;
   setMarkers(markers: MapMarker[]): void;
   highlight(id: string | null): void;
   flyTo(position: LatLng, zoom?: number): void;

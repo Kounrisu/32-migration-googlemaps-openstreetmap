@@ -2,14 +2,25 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+export type MapProvider = 'osm' | 'google';
+
 /**
  * Runtime configuration, loaded from `/config.json` BEFORE the app boots.
  *
  * Why runtime and not `environment.ts`: the same container image / static bundle must be
- * promotable between environments of a cloud platform (dev → staging → prod) without a
+ * promotable between environments of a cloud platform (dev -> staging -> prod) without a
  * rebuild. The platform only has to mount or template one small JSON file.
+ *
+ * `/config.local.json` (gitignored, optional) is merged on top: that is where a developer puts
+ * the Google API key. It must never be committed (the repo is public).
  */
 export interface AppConfig {
+  /** Which map the app uses. Flip to roll back or to compare. */
+  mapProvider: MapProvider;
+  /** Google only. Leave empty to see Google's "development purposes only" mode. */
+  googleApiKey: string;
+  /** Google only. Required by AdvancedMarkerElement; DEMO_MAP_ID is fine for a PoC. */
+  googleMapId: string;
   /** Raster tile endpoint. Production MUST NOT point at tile.openstreetmap.org (see docs/03). */
   tileUrl: string;
   tileAttribution: string;
@@ -23,6 +34,9 @@ export interface AppConfig {
 }
 
 const FALLBACK: AppConfig = {
+  mapProvider: 'osm',
+  googleApiKey: '',
+  googleMapId: 'DEMO_MAP_ID',
   tileUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileAttribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   tileMaxZoom: 19,
@@ -42,12 +56,16 @@ export class ConfigService {
   }
 
   async load(): Promise<void> {
+    this.value = { ...FALLBACK, ...(await this.read('config.json')), ...(await this.read('config.local.json')) };
+  }
+
+  private async read(file: string): Promise<Partial<AppConfig>> {
     try {
-      const loaded = await firstValueFrom(this.http.get<Partial<AppConfig>>('config.json'));
-      this.value = { ...FALLBACK, ...loaded };
+      const body = await firstValueFrom(this.http.get<Partial<AppConfig>>(file));
+      return body && typeof body === 'object' ? body : {};
     } catch {
-      // Keep the fallback: a missing config file must not take the whole front down.
-      console.warn('config.json not found, using built-in defaults');
+      // A missing file (or an SPA fallback page instead of JSON) must not take the front down.
+      return {};
     }
   }
 }

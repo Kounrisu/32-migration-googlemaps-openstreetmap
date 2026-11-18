@@ -4,12 +4,12 @@ import { RouterLink } from '@angular/router';
 import { Geocoder, GeocodeResult } from '../../core/geocoding/geocoder';
 import { LatLng } from '../../core/models';
 import { OfficeService } from '../../core/office.service';
-import { OsmMap } from './osm-map';
+import { OfficeMap } from './office-map';
 
 @Component({
   selector: 'app-find-office',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, OsmMap],
+  imports: [FormsModule, RouterLink, OfficeMap],
   templateUrl: './find-office.html',
   styleUrl: './find-office.css',
 })

@@ -33,5 +33,5 @@
       </li>
     }
   </ul>
-  <app-osm-map [offices]="list()" [selectedId]="selectedId()" [user]="origin()" (officeSelected)="selectedId.set($event)" />
+  <app-office-map [offices]="list()" [selectedId]="selectedId()" [user]="origin()" (officeSelected)="selectedId.set($event)" />
 </div>
