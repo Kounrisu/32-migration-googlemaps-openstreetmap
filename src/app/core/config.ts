@@ -19,8 +19,6 @@ export interface AppConfig {
   mapProvider: MapProvider;
   /** Google only. Leave empty to see Google's "development purposes only" mode. */
   googleApiKey: string;
-  /** Google only. Required by AdvancedMarkerElement; DEMO_MAP_ID is fine for a PoC. */
-  googleMapId: string;
   /** Raster tile endpoint. Production MUST NOT point at tile.openstreetmap.org (see docs/03). */
   tileUrl: string;
   tileAttribution: string;
@@ -36,7 +34,6 @@ export interface AppConfig {
 const FALLBACK: AppConfig = {
   mapProvider: 'osm',
   googleApiKey: '',
-  googleMapId: 'DEMO_MAP_ID',
   tileUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileAttribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   tileMaxZoom: 19,
@@ -69,3 +66,4 @@ export class ConfigService {
     }
   }
 }
+
