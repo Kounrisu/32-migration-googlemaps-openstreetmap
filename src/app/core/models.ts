@@ -11,6 +11,10 @@ export interface Office {
   city: string;
   position: LatLng;
   phone: string;
+  /** Practical arrival info: entrance, step-free route, transport, parking. */
+  accessInfo?: string;
+  /** Photo of the facade/entrance. `alt` is mandatory (RGAA 1.1). Hosted on our own origin. */
+  photo?: { src: string; alt: string };
   /** Filled in by the "near me / near this address" search. */
   distanceKm?: number;
 }

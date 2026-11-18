@@ -47,6 +47,7 @@ npm run build
 4. [docs/04-accessibility-and-privacy.md](docs/04-accessibility-and-privacy.md): RGAA/WCAG for maps, GDPR benefits
 5. [docs/05-cloud-deployment.md](docs/05-cloud-deployment.md): the front inside a cloud platform (runtime config, CSP, proxy, container)
 6. [docs/06-migration-plan.md](docs/06-migration-plan.md): step-by-step plan, checklist, rollback
+7. [docs/07-value-analysis.md](docs/07-value-analysis.md): value analysis of the map function (needs, options, data, mobile)
 
 ## Layout
 

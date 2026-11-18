@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BookingService } from '../../core/booking.service';
 import { Slot } from '../../core/models';
+import { navigationLinks } from '../../core/navigation-links';
 import { OfficeService } from '../../core/office.service';
 
 @Component({
@@ -29,6 +30,11 @@ export class Booking {
       byDay.set(key, [...(byDay.get(key) ?? []), s]);
     }
     return [...byDay.entries()].map(([key, slots]) => ({ key, date: slots[0].start, slots }));
+  });
+
+  protected readonly links = computed(() => {
+    const o = this.office();
+    return o ? navigationLinks(o) : [];
   });
 
   protected readonly chosen = signal<Slot | null>(null);

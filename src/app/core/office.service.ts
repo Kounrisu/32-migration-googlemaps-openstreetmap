@@ -3,8 +3,8 @@ import { LatLng, Office, Slot } from './models';
 
 /** Fictional demo data. A real build swaps this for the back-end API (same shapes). */
 const OFFICES: Office[] = [
-  { id: 'par', name: 'Agence Paris Centre', address: '12 rue de Rivoli', city: 'Paris', position: { lat: 48.8559, lng: 2.3522 }, phone: '01 00 00 00 01' },
-  { id: 'lyo', name: 'Agence Lyon Part-Dieu', address: '8 cours Lafayette', city: 'Lyon', position: { lat: 45.7603, lng: 4.8544 }, phone: '04 00 00 00 02' },
+  { id: 'par', name: 'Agence Paris Centre', address: '12 rue de Rivoli', city: 'Paris', position: { lat: 48.8559, lng: 2.3522 }, phone: '01 00 00 00 01', accessInfo: 'Step-free entrance on the courtyard side. Metro line 1, 2 min walk. No public parking on site.' },
+  { id: 'lyo', name: 'Agence Lyon Part-Dieu', address: '8 cours Lafayette', city: 'Lyon', position: { lat: 45.7603, lng: 4.8544 }, phone: '04 00 00 00 02', accessInfo: 'Entrance next to the tram stop. Lift to the 2nd floor, reception on the left.' },
   { id: 'mrs', name: 'Agence Marseille Vieux-Port', address: '3 quai du Port', city: 'Marseille', position: { lat: 43.2951, lng: 5.3744 }, phone: '04 00 00 00 03' },
   { id: 'lil', name: 'Agence Lille Flandres', address: '21 rue Faidherbe', city: 'Lille', position: { lat: 50.6366, lng: 3.0707 }, phone: '03 00 00 00 04' },
   { id: 'bdx', name: 'Agence Bordeaux Saint-Jean', address: '5 rue Sainte-Catherine', city: 'Bordeaux', position: { lat: 44.8402, lng: -0.5744 }, phone: '05 00 00 00 05' },

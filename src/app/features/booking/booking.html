@@ -8,6 +8,18 @@
       <h2>Appointment confirmed</h2>
       <p>Reference <strong>{{ c.reference }}</strong>. A confirmation would be sent to {{ email() }}.</p>
     </section>
+    <section class="getting-there" aria-labelledby="gt">
+      <h2 id="gt">Getting there</h2>
+      <p>{{ o.address }}, {{ o.city }}</p>
+      @if (o.photo; as p) { <img [src]="p.src" [alt]="p.alt" width="480" height="270" loading="lazy" /> }
+      @if (o.accessInfo) { <p>{{ o.accessInfo }}</p> }
+      <p>Open directions in your own navigation app:</p>
+      <ul>
+        @for (l of links(); track l.label) {
+          <li><a [href]="l.href">{{ l.label }}<span class="sr"> (opens your navigation app or a new page)</span></a></li>
+        }
+      </ul>
+    </section>
   } @else {
     <form (ngSubmit)="submit()">
       <fieldset>
