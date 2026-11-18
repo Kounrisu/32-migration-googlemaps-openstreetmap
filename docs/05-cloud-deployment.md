@@ -1,7 +1,10 @@
 # 05 - The front inside a cloud platform
 
-The front and back of the web app are expected to run on a managed or sovereign cloud platform
-(the exact one is **to be confirmed**; the points below are written to hold on any of them).
+The front and back of the web app are expected to run on **Outscale** (3DS Outscale, French
+sovereign IaaS, SecNumCloud-oriented). The points below stay valid on any similar platform.
+Outscale specifics to verify with the platform team: Kubernetes service (OKS) or plain VMs for
+the nginx container, S3-compatible object storage (OOS) as an option to host the static bundle
+and tiles, load balancer / TLS termination, and the outbound-internet policy (section 3b).
 The map migration changes what the front calls at runtime, so it must be designed for that.
 
 ## 1. Build once, configure at runtime
